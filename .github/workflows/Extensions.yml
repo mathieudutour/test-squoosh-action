@@ -1,0 +1,48 @@
+name: Extensions
+
+on:
+  workflow_dispatch:
+    inputs:
+      paths:
+        description: 'Extensions to update (comma-separated relative paths for extensions) or ("extensions/**"" to execute on all possible subdirectories)'
+        required: true
+  pull_request:
+    paths:
+      - "extensions/**"
+    branches: [main, master]
+
+jobs:
+  extensions_squoosh:
+    if: github.repository == 'raycast/extensions'
+    name: "Squoosh images"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: raycast/github-actions/git-checkout@v1.13.0
+      - name: Get changed extensions
+        id: get_changed_extensions
+        uses: raycast/github-actions/get-changed-extensions@v1.13.0
+        with:
+          custom_paths: ${{ inputs.paths }}
+          github_event_name: ${{ github.event_name }}
+      - uses: actions/github-script@v6
+        id: images
+        env:
+          CHANGED_EXTENSIONS: ${{ steps.get_changed_extensions.outputs.paths }}
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs')
+            const { CHANGED_EXTENSIONS } = process.env
+
+            const images = []
+
+            console.log(CHANGED_EXTENSIONS)
+
+            CHANGED_EXTENSIONS.split('\n').forEach(ext => {
+            })
+
+            return images.join(',')
+      - uses: mathieudutour/github-action-squoosh-images@v1
+        with:
+          images: ${{steps.images.outputs.result}}
