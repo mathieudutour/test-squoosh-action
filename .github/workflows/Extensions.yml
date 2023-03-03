@@ -13,7 +13,7 @@ on:
 
 jobs:
   extensions_squoosh:
-    if: github.repository == 'raycast/extensions'
+    if: github.repository == 'mathieudutour/test-squoosh-action'
     name: "Squoosh images"
     runs-on: ubuntu-latest
     steps:
