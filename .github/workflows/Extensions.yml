@@ -35,11 +35,13 @@ jobs:
           script: |
             const fs = require('fs')
             const path = require('path')
-            const { CHANGED_EXTENSIONS } = process.env
+            const CHANGED_EXTENSIONS = process.env.CHANGED_EXTENSIONS.split('\n')
 
             const images = []
 
-            console.log({CHANGED_EXTENSIONS})
+            if (CHANGED_EXTENSIONS.length > 1) {
+              return images.join(',')
+            }
 
             const getImagesRecursively = (directory) => {
               const filesInDirectory = fs.readdirSync(directory);
@@ -56,7 +58,7 @@ jobs:
               }
             };
 
-            CHANGED_EXTENSIONS.split('\n').forEach(ext => {
+            CHANGED_EXTENSIONS.forEach(ext => {
               getImagesRecursively(ext)
             })
 
@@ -68,3 +70,22 @@ jobs:
         id: compress_images
         with:
           images: ${{steps.images.outputs.result}}
+      - name: Commit
+        if: ${{ steps.get_changed_extensions.outputs.only_deleted == 'false' }}
+        id: commit
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.RAYCAST_BOT_API_ACCESS_TOKEN }}
+        run: |
+          cd ${{ github.workspace }}
+
+          echo "${{steps.compress_images.outputs.markdown}}"
+
+          if [[ $(git diff --stat) != '' ]]; then
+            git add .
+            git commit -m 'Compressed images'
+            git push
+            echo '::set-output name=has_commit::true'
+          else
+            echo 'No changes'
+            echo '::set-output name=has_commit::false'
+          fi
