@@ -26,6 +26,7 @@ jobs:
           custom_paths: ${{ inputs.paths }}
           github_event_name: ${{ github.event_name }}
       - uses: actions/github-script@v6
+        if: ${{ steps.get_changed_extensions.outputs.only_deleted == 'false' }}
         id: images
         env:
           CHANGED_EXTENSIONS: ${{ steps.get_changed_extensions.outputs.paths }}
@@ -62,5 +63,6 @@ jobs:
 
             return images.join(',')
       - uses: mathieudutour/image-actions@main
+        if: ${{ steps.get_changed_extensions.outputs.only_deleted == 'false' }}
         with:
           images: ${{steps.images.outputs.result}}
