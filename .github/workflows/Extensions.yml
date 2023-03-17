@@ -34,6 +34,7 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs')
+            const path = require('path')
             const { CHANGED_EXTENSIONS } = process.env
 
             const images = []
@@ -64,5 +65,6 @@ jobs:
             return images.join(',')
       - uses: mathieudutour/image-actions@main
         if: ${{ steps.get_changed_extensions.outputs.only_deleted == 'false' }}
+        id: compress_images
         with:
           images: ${{steps.images.outputs.result}}
