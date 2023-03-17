@@ -50,7 +50,7 @@ jobs:
                 } else {
                   const extension = path.extname(absolute)
                   if (['.png', '.jpeg', '.jpg', '.webp'].indexOf(extension.toLowerCase()) !== -1) {
-                    files.push(absolute);
+                    images.push(absolute);
                   }
                 }
               }
