@@ -37,12 +37,30 @@ jobs:
 
             const images = []
 
-            console.log(CHANGED_EXTENSIONS)
+            console.log({CHANGED_EXTENSIONS})
+
+            const getImagesRecursively = (directory) => {
+              const filesInDirectory = fs.readdirSync(directory);
+              for (const file of filesInDirectory) {
+                const absolute = path.join(directory, file);
+                if (fs.statSync(absolute).isDirectory()) {
+                  getFilesRecursively(absolute);
+                } else {
+                  const extension = path.extname(absolute)
+                  if (['.png', '.jpeg', '.jpg', '.webp'].indexOf(extension.toLowerCase()) !== -1) {
+                    files.push(absolute);
+                  }
+                }
+              }
+            };
 
             CHANGED_EXTENSIONS.split('\n').forEach(ext => {
+              getImagesRecursively(ext)
             })
 
+            console.log({images})
+
             return images.join(',')
-      - uses: mathieudutour/github-action-squoosh-images@v1
+      - uses: mathieudutour/image-actions@main
         with:
           images: ${{steps.images.outputs.result}}
