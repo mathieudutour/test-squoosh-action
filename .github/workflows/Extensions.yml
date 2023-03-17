@@ -17,6 +17,8 @@ jobs:
     name: "Squoosh images"
     runs-on: ubuntu-latest
     steps:
+      - name: Setup git
+        uses: raycast/github-actions/setup-git@master
       - name: Checkout
         uses: raycast/github-actions/git-checkout@v1.13.0
       - name: Get changed extensions
@@ -84,8 +86,8 @@ jobs:
             git add .
             git commit -m 'Compressed images'
             git push
-            echo '::set-output name=has_commit::true'
+            echo 'has_commit=true' >> $GITHUB_OUTPUT
           else
             echo 'No changes'
-            echo '::set-output name=has_commit::false'
+            echo 'has_commit=false' >> $GITHUB_OUTPUT
           fi
