@@ -75,17 +75,13 @@ jobs:
       - name: Commit
         if: ${{ steps.get_changed_extensions.outputs.only_deleted == 'false' }}
         id: commit
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.RAYCAST_BOT_API_ACCESS_TOKEN }}
         run: |
-          cd ${{ github.workspace }}
-
           echo "${{steps.compress_images.outputs.markdown}}"
 
           if [[ $(git diff --stat) != '' ]]; then
             git add .
             git commit -m 'Compressed images'
-            git push origin HEAD:${{ github.head_ref }}
+            git push
             echo 'has_commit=true' >> $GITHUB_OUTPUT
           else
             echo 'No changes'
